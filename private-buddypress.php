@@ -5,7 +5,7 @@
  * Author: Dennis Morhardt
  * Author URI: http://www.dennismorhardt.de/
  * Plugin URI: http://bp-tutorials.de/
- * Version: 1.0.4
+ * Version: 1.0.5
  * Text Domain: private-buddypress
  * Domain Path: /languages
  *
@@ -51,7 +51,7 @@ class PrivateBuddyPress {
 		
 	function AdminInit() {
 		// Add settings section
-		add_settings_section('private-buddypress', __('BuddyPress Protection', 'private-buddypress'), array($this, 'AdminOptions'), 'privacy');
+		add_settings_section('private-buddypress', __('BuddyPress Protection', 'private-buddypress'), array($this, 'AdminOptions'), 'reading');
 		add_action('load-options.php', array($this, 'SaveAdminOptions'));
 		
 		// Run action
@@ -76,14 +76,11 @@ class PrivateBuddyPress {
 	}
 	
 	function IsBuddyPressFeed() {
-		// Get BuddyPress
-		global $bp;
-		
 		// Default value
 		$isBuddyPressFeed = false;
 		
 		// Check if the current BuddyPress page is a feed
-		if ( $bp->current_action == 'feed' || $bp->action_variables[0] == 'feed' )
+		if ( bp_current_action() == 'feed' || bp_is_action_variable( 'feed', 0 ) )
 			$isBuddyPressFeed = true;
 		
 		// Return false if no BuddyPress feed has been called
@@ -96,10 +93,10 @@ class PrivateBuddyPress {
 	
 		// If blog pages should be protect, add protection to the feeds
 		if ( is_feed() && false == $this->options->exclude->blogpages )
-			$protection = true;
+			$protectBlogFeeds = true;
 		
 		// Filter and return the value
-		return apply_filters('pbp_protect_blog_feeds', $protection);
+		return apply_filters('pbp_protect_blog_feeds', $protectBlogFeeds);
 	}
 	
 	function LoginRedirect() {
@@ -153,23 +150,23 @@ class PrivateBuddyPress {
 		
 	function SaveAdminOptions() {
 		// Check for plausibility
-		if ( 'yes' != $_POST["bp_protection_options"] )
+		if ( isset($_POST["bp_protection_options"]) && 'yes' != $_POST["bp_protection_options"] )
 			return;
 	
 		// Exclude homepage from protection
-		if ( '1' == $_POST["bp_protection_exclude_home"] )
+		if ( isset($_POST["bp_protection_exclude_home"]) && '1' == $_POST["bp_protection_exclude_home"] )
 			$this->options->exclude->homepage = true;
 		else
 			$this->options->exclude->homepage = false;
 				
 		// Exclude registration from protection
-		if ( '1' == $_POST["bp_protection_exclude_registration"] )
+		if ( isset($_POST["bp_protection_exclude_registration"]) && '1' == $_POST["bp_protection_exclude_registration"] )
 			$this->options->exclude->registration = true;
 		else
 			$this->options->exclude->registration = false;
 			
 		// Exclude blog pages from protection
-		if ( '1' == $_POST["bp_protection_exclude_blogpages"] )
+		if ( isset($_POST["bp_protection_exclude_blogpages"]) && '1' == $_POST["bp_protection_exclude_blogpages"] )
 			$this->options->exclude->blogpages = true;
 		else
 			$this->options->exclude->blogpages = false;
