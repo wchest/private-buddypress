@@ -124,7 +124,7 @@ class PrivateBuddyPress {
 				endif;
 			// Redirect to login page if for current page a is required
 			elseif ( $this->LoginRequired() ):
-				$loginPage = apply_filters('pbp_redirect_login_page', get_option('siteurl') . '/wp-login.php?redirect_to=' . $redirect_to, $redirect_to);
+				$loginPage = apply_filters('pbp_redirect_login_page', network_site_url() . '/wp-login.php?redirect_to=' . $redirect_to, $redirect_to);
 				wp_redirect($loginPage);
 				exit;
 			endif;
